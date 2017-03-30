@@ -19,12 +19,12 @@ class Rack::CAS
     return @app.call(env) if exclude_request?(cas_request)
 
     if cas_request.ticket_validation?
-      log env, 'rack-cas: Intercepting ticket validation request.'
+      puts 'rack-cas: Intercepting ticket validation request.'
 
       begin
         user, extra_attrs = get_user(request.url, cas_request.ticket)
       rescue RackCAS::ServiceValidationResponse::TicketInvalidError, RackCAS::SAMLValidationResponse::TicketInvalidError
-        log env, 'rack-cas: Invalid ticket. Redirecting to CAS login.'
+        puts 'rack-cas: Invalid ticket. Redirecting to CAS login.'
 
         return redirect_to server.login_url(cas_request.service_url).to_s
       end
@@ -34,14 +34,14 @@ class Rack::CAS
     end
 
     if cas_request.logout?
-      log env, 'rack-cas: Intercepting logout request.'
+      puts 'rack-cas: Intercepting logout request.'
 
       request.session.send (request.session.respond_to?(:destroy) ? :destroy : :clear)
       return redirect_to server.logout_url(request.params).to_s
     end
 
     if cas_request.single_sign_out? && RackCAS.config.session_store?
-      log env, 'rack-cas: Intercepting single-sign-out request.'
+      puts 'rack-cas: Intercepting single-sign-out request.'
 
       RackCAS.config.session_store.destroy_session_by_cas_ticket(cas_request.ticket)
       return [200, {'Content-Type' => 'text/plain'}, ['CAS Single-Sign-Out request intercepted.']]
@@ -50,7 +50,7 @@ class Rack::CAS
     response = @app.call(env)
 
     if response[0] == 401 && !ignore_intercept?(request) # access denied
-      log env, 'rack-cas: Intercepting 401 access denied response. Redirecting to CAS login.'
+      puts 'rack-cas: Intercepting 401 access denied response. Redirecting to CAS login.'
 
       redirect_to server.login_url(request.url).to_s
     else
