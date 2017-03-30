@@ -93,7 +93,7 @@ module RackCAS
 
     def xml
       return @xml unless @xml.nil?
-
+      puts response
       @xml = Nokogiri::XML(response.body).remove_namespaces!
     end
 
