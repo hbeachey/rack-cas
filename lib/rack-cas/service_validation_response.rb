@@ -94,6 +94,7 @@ module RackCAS
     def xml
       return @xml unless @xml.nil?
       Rails.logger.info "status #{response.code} #{response.message}"
+      Rails.logger.info "heaers #{response.headers}"
       Rails.logger.info "body #{response.body}"
       @xml = Nokogiri::XML(response.body).remove_namespaces!
     end
