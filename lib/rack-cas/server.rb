@@ -10,6 +10,7 @@ module RackCAS
 
     def login_url(service_url, params = {})
       service_url = URL.parse(service_url).to_s
+      Rails.logger.info "service_url #{service_url}"
       base_params = {service: service_url}
       base_params[:renew] = true if RackCAS.config.renew?
 
